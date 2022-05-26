@@ -1,4 +1,4 @@
-FROM        --platform=$TARGETOS/$TARGETARCH python:2.7-alpine
+FROM        --platform=$TARGETOS/$TARGETARCH python:3.10-alpine
 
 RUN         apk add --update --no-cache cmake make ca-certificates curl ffmpeg g++ gcc git openssl sqlite tar tzdata \
 				&& adduser -D -h /home/container container
