@@ -4,7 +4,7 @@ RUN         apk add --update --no-cache cmake make ca-certificates curl ffmpeg g
 				&& adduser -D -h /home/container container
 
 
-LABEL 		org.opencontainers.image.source https://github.com/luxxy-hosting/Docker-Python
+LABEL 		org.opencontainers.image.source https://github.com/trisout78/Docker-Python
 USER        container
 ENV         USER=container HOME=/home/container
 WORKDIR     /home/container
