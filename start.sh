@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Banner ASCII TRISOUT
 cat <<'BANNER'
@@ -15,8 +15,8 @@ BANNER
 ###############################################################################
 
 print_system_box() {
-  local cpu_model="" cpu_usage_pct="" mem_total_kb="" mem_avail_kb="" mem_used_kb="" mem_used_pct="" mem_total_gib="" mem_used_gib=""
-  local node_ver="N/A" pip_ver="N/A"
+  cpu_model="" cpu_usage_pct="" mem_total_kb="" mem_avail_kb="" mem_used_kb="" mem_used_pct="" mem_total_gib="" mem_used_gib=""
+  node_ver="N/A" pip_ver="N/A"
 
   # CPU model (Linux)
   if [ -r /proc/cpuinfo ]; then
@@ -63,23 +63,28 @@ print_system_box() {
   fi
 
   # Prepare pretty box
-  local line_cpu_model="CPU Model : ${cpu_model}"
-  local line_node="Node.js   : ${node_ver}"
-  local line_pip="pip       : ${pip_ver}"
+  line_cpu_model="CPU Model : ${cpu_model}"
+  line_cpu_usage="CPU Usage : ${cpu_usage_pct}"
+  line_mem="Memory    : ${mem_used_gib}/${mem_total_gib} GiB (${mem_used_pct})"
+  line_node="Node.js   : ${node_ver}"
+  line_pip="pip       : ${pip_ver}"
 
   # Determine width (cap at 76) based only on content (no left '# ' prefix now)
-  local width max=0
+  width=0
+  max=0
   for l in "$line_cpu_model" "$line_cpu_usage" "$line_mem" "$line_node" "$line_pip"; do
     [ ${#l} -gt $max ] && max=${#l}
   done
   [ $max -gt 76 ] && max=76
   width=$max
 
-  local border=$(printf '%*s' "$width" '' | tr ' ' '#')
+  border=$(printf '%*s' "$width" '' | tr ' ' '#')
   echo "$border"
-  printf '%-'$width's\n' "$line_cpu_model"
-  printf '%-'$width's\n' "$line_node"
-  printf '%-'$width's\n' "$line_pip"
+  printf "%-${width}s\n" "$line_cpu_model"
+  printf "%-${width}s\n" "$line_cpu_usage"
+  printf "%-${width}s\n" "$line_mem"
+  printf "%-${width}s\n" "$line_node"
+  printf "%-${width}s\n" "$line_pip"
   echo "$border"
   echo
 }
