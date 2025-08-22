@@ -11,12 +11,12 @@ cat <<'BANNER'
 BANNER
 
 ###############################################################################
-# System usage (CPU & Memory)
+# System info (CPU, Python, pip)
 ###############################################################################
 
 print_system_box() {
-  cpu_model="" cpu_usage_pct="" mem_total_kb="" mem_avail_kb="" mem_used_kb="" mem_used_pct="" mem_total_gib="" mem_used_gib=""
-  python_ver="N/A" node_ver="N/A" pip_ver="N/A"
+  cpu_model="" cpu_usage_pct=""
+  python_ver="N/A" pip_ver="N/A"
 
   # CPU model (Linux)
   if [ -r /proc/cpuinfo ]; then
@@ -39,29 +39,11 @@ print_system_box() {
   fi
   [ -z "$cpu_usage_pct" ] && cpu_usage_pct="N/A" || cpu_usage_pct="${cpu_usage_pct}%"
 
-  # Memory usage (Linux)
-  if [ -r /proc/meminfo ]; then
-    mem_total_kb=$(awk '/MemTotal:/ {print $2}' /proc/meminfo)
-    mem_avail_kb=$(awk '/MemAvailable:/ {print $2}' /proc/meminfo)
-    if [ -n "$mem_total_kb" ] && [ -n "$mem_avail_kb" ]; then
-      mem_used_kb=$((mem_total_kb - mem_avail_kb))
-      mem_used_pct=$(( (1000 * mem_used_kb / mem_total_kb + 5) / 10 ))
-      mem_total_gib=$(awk -v kb="$mem_total_kb" 'BEGIN {printf "%.1f", kb/1024/1024}')
-      mem_used_gib=$(awk -v kb="$mem_used_kb" 'BEGIN {printf "%.1f", kb/1024/1024}')
-    fi
-  fi
-
-  [ -z "$mem_total_gib" ] && mem_total_gib="?" && mem_used_gib="?" && mem_used_pct="?"
-  [ -n "$mem_used_pct" ] && mem_used_pct="${mem_used_pct}%"
-
-  # Python, Node & pip versions
+  # Python & pip versions
   if command -v python3 >/dev/null 2>&1; then
     python_ver=$(python3 --version 2>&1 | awk '{print $2}' || echo N/A)
   elif command -v python >/dev/null 2>&1; then
     python_ver=$(python --version 2>&1 | awk '{print $2}' || echo N/A)
-  fi
-  if command -v node >/dev/null 2>&1; then
-    node_ver=$(node -v 2>/dev/null || echo N/A)
   fi
   if command -v pip >/dev/null 2>&1; then
     pip_ver=$(pip --version 2>/dev/null | awk '{print $2}' || echo N/A)
@@ -70,15 +52,13 @@ print_system_box() {
   # Prepare pretty box
   line_cpu_model="CPU Model : ${cpu_model}"
   line_cpu_usage="CPU Usage : ${cpu_usage_pct}"
-  line_mem="Memory    : ${mem_used_gib}/${mem_total_gib} GiB (${mem_used_pct})"
   line_python="Python    : ${python_ver}"
-  line_node="Node.js   : ${node_ver}"
   line_pip="pip       : ${pip_ver}"
 
   # Determine width (cap at 76) based only on content (no left '# ' prefix now)
   width=0
   max=0
-  for l in "$line_cpu_model" "$line_cpu_usage" "$line_mem" "$line_python" "$line_node" "$line_pip"; do
+  for l in "$line_cpu_model" "$line_cpu_usage" "$line_python" "$line_pip"; do
     [ ${#l} -gt $max ] && max=${#l}
   done
   [ $max -gt 76 ] && max=76
@@ -87,10 +67,7 @@ print_system_box() {
   border=$(printf '%*s' "$width" '' | tr ' ' '#')
   echo "$border"
   printf "%-${width}s\n" "$line_cpu_model"
-  printf "%-${width}s\n" "$line_cpu_usage"
-  printf "%-${width}s\n" "$line_mem"
   printf "%-${width}s\n" "$line_python"
-  printf "%-${width}s\n" "$line_node"
   printf "%-${width}s\n" "$line_pip"
   echo "$border"
   echo
