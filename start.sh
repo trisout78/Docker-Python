@@ -16,7 +16,7 @@ BANNER
 
 print_system_box() {
   local cpu_model="" cpu_usage_pct="" mem_total_kb="" mem_avail_kb="" mem_used_kb="" mem_used_pct="" mem_total_gib="" mem_used_gib=""
-  local node_ver="N/A" npm_ver="N/A"
+  local node_ver="N/A" pip_ver="N/A"
 
   # CPU model (Linux)
   if [ -r /proc/cpuinfo ]; then
@@ -54,22 +54,22 @@ print_system_box() {
   [ -z "$mem_total_gib" ] && mem_total_gib="?" && mem_used_gib="?" && mem_used_pct="?"
   [ -n "$mem_used_pct" ] && mem_used_pct="${mem_used_pct}%"
 
-  # Node & npm versions
+  # Node & pip versions
   if command -v node >/dev/null 2>&1; then
     node_ver=$(node -v 2>/dev/null || echo N/A)
   fi
-  if command -v npm >/dev/null 2>&1; then
-    npm_ver=$(npm -v 2>/dev/null || echo N/A)
+  if command -v pip >/dev/null 2>&1; then
+    pip_ver=$(pip --version 2>/dev/null | awk '{print $2}' || echo N/A)
   fi
 
   # Prepare pretty box
   local line_cpu_model="CPU Model : ${cpu_model}"
   local line_node="Node.js   : ${node_ver}"
-  local line_npm="npm       : ${npm_ver}"
+  local line_pip="pip       : ${pip_ver}"
 
   # Determine width (cap at 76) based only on content (no left '# ' prefix now)
   local width max=0
-  for l in "$line_cpu_model" "$line_cpu_usage" "$line_mem" "$line_node" "$line_npm"; do
+  for l in "$line_cpu_model" "$line_cpu_usage" "$line_mem" "$line_node" "$line_pip"; do
     [ ${#l} -gt $max ] && max=${#l}
   done
   [ $max -gt 76 ] && max=76
@@ -79,7 +79,7 @@ print_system_box() {
   echo "$border"
   printf '%-'$width's\n' "$line_cpu_model"
   printf '%-'$width's\n' "$line_node"
-  printf '%-'$width's\n' "$line_npm"
+  printf '%-'$width's\n' "$line_pip"
   echo "$border"
   echo
 }
